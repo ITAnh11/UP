@@ -84,6 +84,18 @@ bool init()
 bool loadMedia()
 {
     bool success = true;
+
+    gBackground1 = new BaseObject;
+    if (!gBackground1->loadFromFile("Image/background/8666420.jpg"))
+    {
+        success = false;
+        printf("Failed to load background\n");
+    }
+    else
+    {
+        gBackground1->setScale(1.0f * SCREEN_HEIGHT / gBackground1->getHeight());
+    }
+
     return success;
 }
 
@@ -123,7 +135,7 @@ int main(int argc, char *args[])
 
     SDL_Event event;
     bool quit = false;
-
+    
     while (!quit)
     {
         while (SDL_PollEvent(&event))
@@ -138,6 +150,7 @@ int main(int argc, char *args[])
         SDL_SetRenderDrawColor(gRenderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(gRenderer);
 
+        gBackground1->render(0, 0);
         SDL_RenderPresent(gRenderer);
     }
 
