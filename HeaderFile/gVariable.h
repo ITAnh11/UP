@@ -3,9 +3,11 @@
 
 #include "Constant.h"
 #include "BaseObject.h"
+#include "PlayerObject.h"
 
 extern TTF_Font *gFont;
 
-extern BaseObject* gBackground1;
+extern BaseObject* gBackground;
+extern PlayerObject* gPlayer;
 
 #endif

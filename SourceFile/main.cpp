@@ -1,5 +1,6 @@
 #include "../HeaderFile/Constant.h"
 #include "../HeaderFile/gVariable.h"
+#include "../HeaderFile/Game.h"
 
 // Starts up SDL and creates window
 bool init();
@@ -85,17 +86,27 @@ bool loadMedia()
 {
     bool success = true;
 
-    gBackground1 = new BaseObject;
-    if (!gBackground1->loadFromFile("Image/background/8666420.jpg"))
+    if (!gBackground->loadFromFile("Image/background/8666420.jpg"))
     {
         success = false;
         printf("Failed to load background\n");
     }
     else
     {
-        gBackground1->setScale(1.0f * SCREEN_HEIGHT / gBackground1->getHeight());
+        gBackground->setScale(1.0f * SCREEN_HEIGHT / gBackground->getHeight());
     }
 
+    if (!gPlayer->loadFromFile("Image/Player/10_Character_Idle_48x48.png"))
+    {
+        success=false;
+        printf("Failed to load player\n");
+    }
+    else
+    {
+        gPlayer->setNumFrame(NUM_FRAMES_IDLE);
+        gPlayer->setClip();
+        gPlayer->setScale(2);
+    }
     return success;
 }
 
@@ -133,26 +144,6 @@ int main(int argc, char *args[])
         return 1;
     }
 
-    SDL_Event event;
-    bool quit = false;
-    
-    while (!quit)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                quit = true;
-                break;
-            }
-        }
-
-        SDL_SetRenderDrawColor(gRenderer, 0xff, 0xff, 0xff, 0xff);
-        SDL_RenderClear(gRenderer);
-
-        gBackground1->render(0, 0);
-        SDL_RenderPresent(gRenderer);
-    }
-
+    GAME::run();
     return 0;
 }

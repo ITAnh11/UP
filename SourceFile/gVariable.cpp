@@ -2,5 +2,6 @@
 
 TTF_Font *gFont = NULL;
 
-BaseObject* gBackground1 = NULL;
+BaseObject* gBackground = new BaseObject;
+PlayerObject* gPlayer = new PlayerObject;
 
