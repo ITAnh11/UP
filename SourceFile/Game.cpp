@@ -14,10 +14,18 @@ bool GAME::loadPlayer()
 bool GAME::run()
 {
     SDL_Event event;
+
     bool quit = false;
-    
+
+    Uint32 frameStart;
+    int frameTime;
+
+    gPlayer->setXY(SCREEN_WIDTH / 2, SCREEN_HEIGHT - gPlayer->getHeight() - 100);
+
     while (!quit)
     {
+        frameStart = SDL_GetTicks();
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
@@ -32,9 +40,18 @@ bool GAME::run()
         SDL_RenderClear(gRenderer);
 
         gBackground->render(0, 0);
-        gPlayer->renderClips(SCREEN_WIDTH/2,SCREEN_HEIGHT/2);
+
+        gPlayer->doPlayer();
+        gPlayer->handleMove();
+        gPlayer->renderClips(gPlayer->getRect().x, gPlayer->getRect().y);
 
         SDL_RenderPresent(gRenderer);
+
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime)
+        {
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 
     return true;

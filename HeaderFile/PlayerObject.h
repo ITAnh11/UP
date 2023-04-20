@@ -4,24 +4,24 @@
 #include "Constant.h"
 #include "BaseObject.h"
 
+enum Direction
+{
+	LEFT,
+	RIGHT,
+};
+
 enum StatusPlayer
 {
 	JUMP,
-	DIE,
+	MOVE,
 	IDLE,
-	WALK,
-};
-
-enum Directions
-{
-	LEFT = -1,
-	RIGHT = 1,
 };
 
 struct InputAction
 {
 	bool jump;
-	bool walk;
+	bool moveRight;
+	bool moveLeft;
 };
 
 
@@ -37,6 +37,7 @@ public:
 
 	void renderClips(const int x, const int y);
 
+	void doPlayer();
 	void handleMove();
 	void handleInputAction(SDL_Event event);
 
@@ -47,9 +48,12 @@ private:
 	int mFrame;
 	SDL_Rect mSpriteClips[20];
 	int mNumberFrame;
-	StatusPlayer mStatus;
-	Directions mDirect;
 	InputAction mInputAction;
+	int mJumpHeight;
+	int mXval;
+	int mYval;
+	Direction mDirect;
+	StatusPlayer mStatus;
 };
 
 #endif

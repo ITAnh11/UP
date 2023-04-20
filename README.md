@@ -9,3 +9,4 @@
         
         https://user-images.githubusercontent.com/111406683/233364131-d12042f7-7126-4d12-af6a-68fd18613c5b.mp4
 
+        - 2.1.2 Player move, jump

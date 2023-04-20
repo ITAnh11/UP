@@ -5,10 +5,14 @@ PlayerObject::PlayerObject()
     mRect = {0, 0, 0, 0};
     mFrame = 0;
     mNumberFrame = 1;
-    mStatus = IDLE;
-    mDirect = RIGHT;
-    mInputAction.walk = false;
+    mInputAction.moveRight = false;
+    mInputAction.moveLeft = false;
     mInputAction.jump = false;
+    mJumpHeight = 0;
+    mXval = 0;
+    mYval = 0;
+    mDirect = RIGHT;
+    mStatus = IDLE;
 }
 
 PlayerObject::~PlayerObject()
@@ -34,102 +38,139 @@ void PlayerObject::setClip()
 
 void PlayerObject::renderClips(const int x, const int y)
 {
-    SDL_Rect *currentClip = &mSpriteClips[mFrame / 20];
-    ++mFrame;
-    if (mFrame == mNumberFrame *20)
-        mFrame = 0;
+    SDL_Rect *currentClip = &mSpriteClips[mFrame];
+    if (mInputAction.jump)
+    {
+        if (mJumpHeight < MAX_JUMP_HEIGHT)
+            mFrame = 0;
+        else if (mJumpHeight == MAX_JUMP_HEIGHT)
+            mFrame = 1;
+        else
+            mFrame = 2;
+    }
+    else
+    {
+        ++mFrame;
+        if (mFrame == mNumberFrame)
+            mFrame = 0;
+    }
+
     if (mDirect == LEFT)
         render(x, y, currentClip, 0, 0, SDL_FLIP_HORIZONTAL);
     else
         render(x, y, currentClip);
 }
 
+void PlayerObject::doPlayer()
+{
+    if (mInputAction.moveLeft)
+        mXval = -SPEED_MOVE;
+    if (mInputAction.moveRight)
+        mXval = +SPEED_MOVE;
+    if (!mInputAction.moveLeft && !mInputAction.moveRight)
+        mXval = 0;
+
+    if (mJumpHeight == MAX_JUMP_HEIGHT * 2)
+    {
+        mJumpHeight = 0;
+        mYval = 0;
+    }
+    else if (mInputAction.jump)
+    {
+        if (mJumpHeight < MAX_JUMP_HEIGHT)
+        {
+            mJumpHeight += SPEED_JUMP;
+            mYval = -SPEED_JUMP;
+        }
+        else
+        {
+            mJumpHeight += SPEED_JUMP;
+            mYval = +SPEED_JUMP;
+        }
+    }
+}
+
 void PlayerObject::handleMove()
 {
+    mRect.x += mXval;
+    mRect.y += mYval;
+
+    if (mRect.x > SCREEN_WIDTH)
+        mRect.x = 0 - mWidth / mNumberFrame;
+    else if (mRect.x < 0 - mWidth / mNumberFrame)
+        mRect.x = SCREEN_WIDTH;
 }
 
 void PlayerObject::handleInputAction(SDL_Event event)
 {
-    StatusPlayer nextStatus;
+    StatusPlayer nextStatus = mStatus;
     if (event.type == SDL_KEYDOWN)
     {
         switch (event.key.keysym.sym)
         {
         case SDLK_a:
-            mInputAction.walk = true;
-            nextStatus = WALK;
+            mInputAction.moveLeft = true;
+            mInputAction.moveRight = false;
             mDirect = LEFT;
+            if (mStatus != JUMP)
+                nextStatus = MOVE;
             break;
-
         case SDLK_d:
-            mInputAction.walk = true;
-            nextStatus = WALK;
+            mInputAction.moveRight = true;
+            mInputAction.moveLeft = false;
             mDirect = RIGHT;
+            if (mStatus != JUMP)
+                nextStatus = MOVE;
             break;
         case SDLK_SPACE:
             mInputAction.jump = true;
             nextStatus = JUMP;
-            break;
         default:
             break;
         }
     }
-
-    if (event.type == SDL_KEYUP)
+    else if (event.type == SDL_KEYUP)
     {
         switch (event.key.keysym.sym)
         {
         case SDLK_a:
-            mInputAction.walk = false;
-            nextStatus = IDLE;
+            mInputAction.moveLeft = false;
             break;
         case SDLK_d:
-            mInputAction.walk = false;
-            nextStatus = IDLE;
-            break;
-        case SDLK_SPACE:
-            mInputAction.jump = false;
+            mInputAction.moveRight = false;
             break;
         default:
             break;
         }
     }
 
-    if (mInputAction.jump == true || mInputAction.walk == true)
+    if (nextStatus != mStatus)
     {
-        if (mStatus != nextStatus)
+        mStatus = nextStatus;
+        mFrame = 0;
+        if (mInputAction.jump || mInputAction.moveLeft || mInputAction.moveRight)
         {
-            mFrame = 0;
-            mStatus = nextStatus;
-            switch (mStatus)
+            if (mInputAction.jump)
             {
-            case WALK:
-                loadFromFile("Image/Player/8_PlayerWalk_48x48.png");
-                setNumFrame(NUM_FRAMES_WALK);
-                setClip();
-                break;
-            case JUMP:
                 loadFromFile("Image/Player/3_player_jump_48x48.png");
                 setNumFrame(NUM_FRAMES_JUMP);
                 setClip();
-                break;
-            default:
-                loadFromFile("Image/Player/10_Character_Idle_48x48.png");
-                setNumFrame(NUM_FRAMES_IDLE);
+            }
+            else if ((mInputAction.moveLeft || mInputAction.moveRight) && mInputAction.jump == false)
+            {
+                loadFromFile("Image/Player/8_PlayerWalk_48x48.png");
+                setNumFrame(NUM_FRAMES_MOVE);
                 setClip();
-                break;
             }
         }
     }
-    else
+
+    if (!mInputAction.jump && !mInputAction.moveLeft && !mInputAction.moveRight && mStatus != IDLE)
     {
-        if (mStatus != nextStatus)
-        {
-            mFrame = 0;
-            mStatus = nextStatus;
-            loadFromFile("Image/Player/10_Character_Idle_48x48.png");
-            setNumFrame(NUM_FRAMES_IDLE);
-            setClip();
-        }
+        mStatus = IDLE;
+        mFrame = 0;
+        loadFromFile("Image/Player/10_Character_Idle_48x48.png");
+        setNumFrame(NUM_FRAMES_IDLE);
+        setClip();
     }
 }
