@@ -6,3 +6,6 @@
 * 2.0 Game
     - 2.1 PlayerObject
         - 2.1.1 render clips player idle, jump, walk
+        
+        https://user-images.githubusercontent.com/111406683/233364131-d12042f7-7126-4d12-af6a-68fd18613c5b.mp4
+
