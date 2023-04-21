@@ -3,12 +3,12 @@
 
 #include "Constant.h"
 #include "gVariable.h"
+#include "GameMap.h"
 
 namespace GAME
 {
     bool initGame();
     bool loadPlayer();
-
     bool run();
 };
 

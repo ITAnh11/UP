@@ -98,7 +98,7 @@ bool loadMedia()
 
     if (!gPlayer->loadFromFile("Image/Player/10_Character_Idle_48x48.png"))
     {
-        success=false;
+        success = false;
         printf("Failed to load player\n");
     }
     else
@@ -107,11 +107,27 @@ bool loadMedia()
         gPlayer->setClip();
         gPlayer->setScale(2);
     }
+
+    if (!gTileTexture->loadFromFile("Image/map/tile.png"))
+    {
+        success = false;
+        printf("Failed to load image tile\n");
+    }
+
+    if (!GAME::initGame())
+    {
+        success = false;
+        printf("Failed to init game\n");
+    }
     return success;
 }
 
 void close()
 {
+    gBackground->free();
+    gTileTexture->free();
+    gPlayer->free();
+
     // Free global font
     TTF_CloseFont(gFont);
     gFont = NULL;
@@ -145,5 +161,7 @@ int main(int argc, char *args[])
     }
 
     GAME::run();
+
+    close();
     return 0;
 }

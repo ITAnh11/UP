@@ -36,7 +36,7 @@ void PlayerObject::setClip()
     }
 }
 
-void PlayerObject::renderClips(const int x, const int y)
+void PlayerObject::renderClips(SDL_Rect &camera)
 {
     SDL_Rect *currentClip = &mSpriteClips[mFrame];
     if (mInputAction.jump)
@@ -56,9 +56,9 @@ void PlayerObject::renderClips(const int x, const int y)
     }
 
     if (mDirect == LEFT)
-        render(x, y, currentClip, 0, 0, SDL_FLIP_HORIZONTAL);
+        render(mRect.x - camera.x, mRect.y - camera.y, currentClip, 0, 0, SDL_FLIP_HORIZONTAL);
     else
-        render(x, y, currentClip);
+        render(mRect.x - camera.x, mRect.y - camera.y, currentClip);
 }
 
 void PlayerObject::doPlayer()
@@ -172,5 +172,30 @@ void PlayerObject::handleInputAction(SDL_Event event)
         loadFromFile("Image/Player/10_Character_Idle_48x48.png");
         setNumFrame(NUM_FRAMES_IDLE);
         setClip();
+    }
+}
+
+void PlayerObject::setCamera(SDL_Rect &camera)
+{
+    // Center the camera over the dot
+    camera.x = (mRect.x + mWidth * mScale / 2) - SCREEN_WIDTH / 2;
+    camera.y = (mRect.y + mHeight * mScale / 2) - SCREEN_HEIGHT / 2;
+
+    // Keep the camera in bounds
+    if (camera.x < 0)
+    {
+        camera.x = 0;
+    }
+    if (camera.y < 0)
+    {
+        camera.y = 0;
+    }
+    if (camera.x > MAP_WIDTH - camera.w)
+    {
+        camera.x = MAP_WIDTH - camera.w;
+    }
+    if (camera.y > MAP_HEIGHT - camera.h)
+    {
+        camera.y = MAP_HEIGHT - camera.h;
     }
 }

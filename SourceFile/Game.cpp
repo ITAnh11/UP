@@ -2,7 +2,14 @@
 
 bool GAME::initGame()
 {
-    return true;
+    bool success = true;
+
+    if (!GAMEMAP::setTiles("Image/map/map.txt"))
+    {
+        success = false;
+        printf("Failed to set tiles\n");
+    }
+    return success;
 }
 
 bool GAME::loadPlayer()
@@ -20,7 +27,7 @@ bool GAME::run()
     Uint32 frameStart;
     int frameTime;
 
-    gPlayer->setXY(SCREEN_WIDTH / 2, SCREEN_HEIGHT - gPlayer->getHeight() - 100);
+    gPlayer->setXY(SCREEN_WIDTH / 2, MAP_HEIGHT - gPlayer->getHeight() - 100);
 
     while (!quit)
     {
@@ -35,15 +42,19 @@ bool GAME::run()
             }
             gPlayer->handleInputAction(event);
         }
+        // move player
+        gPlayer->doPlayer();
+        gPlayer->handleMove();
+        gPlayer->setCamera(gCamera);
 
         SDL_SetRenderDrawColor(gRenderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(gRenderer);
 
         gBackground->render(0, 0);
 
-        gPlayer->doPlayer();
-        gPlayer->handleMove();
-        gPlayer->renderClips(gPlayer->getRect().x, gPlayer->getRect().y);
+        GAMEMAP::render();
+
+        gPlayer->renderClips(gCamera);
 
         SDL_RenderPresent(gRenderer);
 

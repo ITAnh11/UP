@@ -35,13 +35,16 @@ public:
 	void setClip();
 	void setNumFrame(const int val) { mNumberFrame = val; }
 
-	void renderClips(const int x, const int y);
+	void renderClips(SDL_Rect &camera);
 
 	void doPlayer();
 	void handleMove();
 	void handleInputAction(SDL_Event event);
 
 	SDL_Rect getRect() const { return mRect; }
+
+	//Centers the camera over the dot
+    void setCamera( SDL_Rect& camera );
 
 private:
 	SDL_Rect mRect;
