@@ -1,5 +1,4 @@
 #include "../HeaderFile/PlayerObject.h"
-
 PlayerObject::PlayerObject()
 {
     mRect = {0, 0, 0, 0};
@@ -13,6 +12,7 @@ PlayerObject::PlayerObject()
     mYval = 0;
     mDirect = RIGHT;
     mStatus = IDLE;
+    mOnGround = false;
 }
 
 PlayerObject::~PlayerObject()
@@ -36,14 +36,22 @@ void PlayerObject::setClip()
     }
 }
 
+void PlayerObject::setRectangle()
+{
+    mBox.x = mRect.x + 11;
+    mBox.y = mRect.y + 9;
+    mBox.w = (30 - 11) * mScale;
+    mBox.h = (43 - 9) * mScale;
+}
+
 void PlayerObject::renderClips(SDL_Rect &camera)
 {
     SDL_Rect *currentClip = &mSpriteClips[mFrame];
     if (mInputAction.jump)
     {
-        if (mJumpHeight < MAX_JUMP_HEIGHT)
+        if (mJumpHeight < MAX_JUMP_HEIGHT - MAX_JUMP_HEIGHT / 8)
             mFrame = 0;
-        else if (mJumpHeight == MAX_JUMP_HEIGHT)
+        else if (mJumpHeight >= MAX_JUMP_HEIGHT - MAX_JUMP_HEIGHT / 8 && mJumpHeight < MAX_JUMP_HEIGHT + MAX_JUMP_HEIGHT / 32)
             mFrame = 1;
         else
             mFrame = 2;
@@ -61,7 +69,62 @@ void PlayerObject::renderClips(SDL_Rect &camera)
         render(mRect.x - camera.x, mRect.y - camera.y, currentClip);
 }
 
-void PlayerObject::doPlayer()
+StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileSet, SDL_Rect &camera)
+{
+    if (mJumpHeight <= MAX_JUMP_HEIGHT)
+        return NONE;
+
+    StatusCollisionwithMap statusCollision = NONE;
+    bool collision = false;
+
+    SDL_Rect a = mBox;
+
+    // check down
+    a.x = mBox.x;
+    a.y = mBox.y + mYval;
+
+    int i_tile = round(1.0f * (a.y + a.h) / TILE_HEIGHT);
+    if (i_tile >= NUM_TILE_ROWS)
+        return DIE;
+
+    int j_tile = round(1.0f * a.x / TILE_WIDTH);
+    if (j_tile < 0)
+        j_tile = 0;
+
+    if (checkCollision(mBox, camera))
+    {
+        int index = i_tile * NUM_TILE_COLS + j_tile;
+
+        for (int nextIndex = 0; nextIndex < 2; ++nextIndex)
+        {
+            if ((index + nextIndex) / NUM_TILE_COLS > i_tile + 1)
+                break;
+            if (gTileSet[index + nextIndex]->getType() != -1)
+            {
+                collision = (collision | checkCollision(a, gTileSet[index + nextIndex]->getBox()));
+                if (collision)
+                {
+                    int typeTile = gTileSet[index + nextIndex]->getType();
+
+                    if (typeTile == TILE_SPECIAL_BOX)
+                        statusCollision = SPECIAL_BOX;
+                    else if (TILE_DIE_BEGIN <= typeTile && typeTile <= TILE_DIE_END)
+                        statusCollision = DIE;
+                    else
+                        statusCollision = ON_GROUND;
+
+                    mYval = mYval - (a.y + a.h - gTileSet[index + nextIndex]->getBox().y);
+                    mJumpHeight = 0;
+                    break;
+                }
+            }
+        }
+    }
+
+    return statusCollision;
+}
+
+void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera)
 {
     if (mInputAction.moveLeft)
         mXval = -SPEED_MOVE;
@@ -70,12 +133,7 @@ void PlayerObject::doPlayer()
     if (!mInputAction.moveLeft && !mInputAction.moveRight)
         mXval = 0;
 
-    if (mJumpHeight == MAX_JUMP_HEIGHT * 2)
-    {
-        mJumpHeight = 0;
-        mYval = 0;
-    }
-    else if (mInputAction.jump)
+    if (mInputAction.jump)
     {
         if (mJumpHeight < MAX_JUMP_HEIGHT)
         {
@@ -88,6 +146,10 @@ void PlayerObject::doPlayer()
             mYval = +SPEED_JUMP;
         }
     }
+
+    StatusCollisionwithMap stCollision = checkCollisonwithMap(gTileSet, camera);
+    if (stCollision == DIE)
+        mStatus = DEATH;
 }
 
 void PlayerObject::handleMove()
@@ -99,6 +161,8 @@ void PlayerObject::handleMove()
         mRect.x = 0 - mWidth / mNumberFrame;
     else if (mRect.x < 0 - mWidth / mNumberFrame)
         mRect.x = SCREEN_WIDTH;
+
+    setRectangle();
 }
 
 void PlayerObject::handleInputAction(SDL_Event event)

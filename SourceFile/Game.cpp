@@ -27,8 +27,8 @@ bool GAME::run()
     Uint32 frameStart;
     int frameTime;
 
-    gPlayer->setXY(SCREEN_WIDTH / 2, MAP_HEIGHT - gPlayer->getHeight() - 100);
-
+    gPlayer->setXY(SCREEN_WIDTH / 2, MAP_HEIGHT - TILE_HEIGHT - gPlayer->getHeight() * gPlayer->getScale());
+    // gPlayer->setXY(300,900);
     while (!quit)
     {
         frameStart = SDL_GetTicks();
@@ -43,9 +43,16 @@ bool GAME::run()
             gPlayer->handleInputAction(event);
         }
         // move player
-        gPlayer->doPlayer();
+        gPlayer->doPlayer(gTileSet, gCamera);
         gPlayer->handleMove();
         gPlayer->setCamera(gCamera);
+
+        StatusPlayer stPlayer = gPlayer->getStatus();
+        if (stPlayer == DEATH)
+        {
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "UP", "You Die", NULL);
+            quit = true;
+        }
 
         SDL_SetRenderDrawColor(gRenderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(gRenderer);

@@ -106,6 +106,7 @@ bool loadMedia()
         gPlayer->setNumFrame(NUM_FRAMES_IDLE);
         gPlayer->setClip();
         gPlayer->setScale(2);
+        gPlayer->setRectangle();
     }
 
     if (!gTileTexture->loadFromFile("Image/map/tile.png"))
@@ -127,6 +128,7 @@ void close()
     gBackground->free();
     gTileTexture->free();
     gPlayer->free();
+    gTileSet.clear();
 
     // Free global font
     TTF_CloseFont(gFont);

@@ -19,6 +19,7 @@ bool GAMEMAP::setTiles(const string path)
     }
     else
     {
+        gTileSet.resize(TOTAL_TILES);
         // Initialize the tiles
         for (int i = 0; i < TOTAL_TILES; ++i)
         {

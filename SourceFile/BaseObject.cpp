@@ -102,7 +102,6 @@ void BaseObject::render(int x, int y, SDL_Rect *clip, double angle, SDL_Point *c
 
     renderQuad.w *= mScale;
     renderQuad.h *= mScale;
-
     // Render to screen
     SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
