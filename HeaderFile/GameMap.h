@@ -11,6 +11,12 @@ namespace GAMEMAP
 
     // Render map
     void render();
+
+    void updateCollision(int &index);
+
+    void pushMapDown(SDL_Rect &camera, int &numRows);
+    void randomTopMap(const int &numRows);
+    void updateRandom(int &i_tile, int &index, SDL_Rect &camera);
 }
 
 #endif

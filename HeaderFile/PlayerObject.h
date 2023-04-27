@@ -29,7 +29,7 @@ struct InputAction
 enum StatusCollisionwithMap
 {
 	DIE,
-	SPECIAL_BOX,
+	TAKE_SPECIAL_BOX,
 	ON_GROUND,
 	NONE,
 };
@@ -50,9 +50,9 @@ public:
 
 	void renderClips(SDL_Rect &camera);
 
-	StatusCollisionwithMap checkCollisonwithMap(vector<Tile *> &gTileSet, SDL_Rect &camera);
+	StatusCollisionwithMap checkCollisonwithMap(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return);
 
-	void doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera);
+	void doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return);
 	void handleMove();
 	void handleInputAction(SDL_Event event);
 
@@ -67,6 +67,7 @@ private:
 	int mNumberFrame;
 	InputAction mInputAction;
 	int mJumpHeight;
+	int mMaxJumpHeight;
 	int mXval;
 	int mYval;
 	Direction mDirect;

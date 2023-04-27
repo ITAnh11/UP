@@ -12,7 +12,8 @@ extern BaseObject *gBackground;
 extern PlayerObject *gPlayer;
 extern BaseObject *gTileTexture;
 extern SDL_Rect gTileClips[TOTAL_TILE_SPRITES];
-extern vector <Tile*> gTileSet;
+extern vector<Tile *> gTileSet;
 extern SDL_Rect gCamera;
+extern int top_i_have_tile;
 
 #endif

@@ -8,6 +8,7 @@ PlayerObject::PlayerObject()
     mInputAction.moveLeft = false;
     mInputAction.jump = false;
     mJumpHeight = 0;
+    mMaxJumpHeight = MAX_JUMP_HEIGHT;
     mXval = 0;
     mYval = 0;
     mDirect = RIGHT;
@@ -49,9 +50,9 @@ void PlayerObject::renderClips(SDL_Rect &camera)
     SDL_Rect *currentClip = &mSpriteClips[mFrame];
     if (mInputAction.jump)
     {
-        if (mJumpHeight < MAX_JUMP_HEIGHT - MAX_JUMP_HEIGHT / 8)
+        if (mJumpHeight < mMaxJumpHeight - SPEED_JUMP * 6)
             mFrame = 0;
-        else if (mJumpHeight >= MAX_JUMP_HEIGHT - MAX_JUMP_HEIGHT / 8 && mJumpHeight < MAX_JUMP_HEIGHT + MAX_JUMP_HEIGHT / 32)
+        else if (mJumpHeight >= mMaxJumpHeight - SPEED_JUMP * 6 && mJumpHeight < mMaxJumpHeight + SPEED_JUMP * 2)
             mFrame = 1;
         else
             mFrame = 2;
@@ -69,9 +70,9 @@ void PlayerObject::renderClips(SDL_Rect &camera)
         render(mRect.x - camera.x, mRect.y - camera.y, currentClip);
 }
 
-StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileSet, SDL_Rect &camera)
+StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return)
 {
-    if (mJumpHeight <= MAX_JUMP_HEIGHT)
+    if (mJumpHeight <= mMaxJumpHeight)
         return NONE;
 
     StatusCollisionwithMap statusCollision = NONE;
@@ -83,11 +84,11 @@ StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileS
     a.x = mBox.x;
     a.y = mBox.y + mYval;
 
-    int i_tile = round(1.0f * (a.y + a.h) / TILE_HEIGHT);
+    int i_tile = (a.y + a.h) / TILE_HEIGHT;
     if (i_tile >= NUM_TILE_ROWS)
         return DIE;
 
-    int j_tile = round(1.0f * a.x / TILE_WIDTH);
+    int j_tile = a.x / TILE_WIDTH + 1;
     if (j_tile < 0)
         j_tile = 0;
 
@@ -95,7 +96,7 @@ StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileS
     {
         int index = i_tile * NUM_TILE_COLS + j_tile;
 
-        for (int nextIndex = 0; nextIndex < 2; ++nextIndex)
+        for (int nextIndex = 0; nextIndex < 3; ++nextIndex)
         {
             if ((index + nextIndex) / NUM_TILE_COLS > i_tile + 1)
                 break;
@@ -104,17 +105,29 @@ StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileS
                 collision = (collision | checkCollision(a, gTileSet[index + nextIndex]->getBox()));
                 if (collision)
                 {
+                    indexReturn = index + nextIndex;
+                    i_tile_return = i_tile;
+
                     int typeTile = gTileSet[index + nextIndex]->getType();
 
                     if (typeTile == TILE_SPECIAL_BOX)
-                        statusCollision = SPECIAL_BOX;
-                    else if (TILE_DIE_BEGIN <= typeTile && typeTile <= TILE_DIE_END)
+                    {
+                        statusCollision = TAKE_SPECIAL_BOX;
+                    }
+                    else if (TILE_THORN_BEGIN <= typeTile && typeTile <= TILE_THORN_END)
+                    {
                         statusCollision = DIE;
+                    }
+                    else if (TILE_CLOUD_BEGIN <= typeTile && typeTile <= TILE_CLOUD_END)
+                    {
+                        statusCollision = NONE;
+                        i_tile_return = -1;
+                    }
                     else
+                    {
                         statusCollision = ON_GROUND;
+                    }
 
-                    mYval = mYval - (a.y + a.h - gTileSet[index + nextIndex]->getBox().y);
-                    mJumpHeight = 0;
                     break;
                 }
             }
@@ -124,7 +137,7 @@ StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileS
     return statusCollision;
 }
 
-void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera)
+void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return)
 {
     if (mInputAction.moveLeft)
         mXval = -SPEED_MOVE;
@@ -135,21 +148,41 @@ void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera)
 
     if (mInputAction.jump)
     {
-        if (mJumpHeight < MAX_JUMP_HEIGHT)
+        if (mJumpHeight < mMaxJumpHeight)
         {
-            mJumpHeight += SPEED_JUMP;
-            mYval = -SPEED_JUMP;
+            if (mMaxJumpHeight == SPECIAL_MAX_JUMP_HEIGHT)
+            {
+                mJumpHeight += SPECIAL_SPEED_JUMP;
+                mYval = -SPECIAL_SPEED_JUMP;
+            }
+            else
+            {
+                mJumpHeight += SPEED_JUMP;
+                mYval = -SPEED_JUMP;
+            }
         }
         else
         {
+            if (mJumpHeight >= mMaxJumpHeight + SPEED_JUMP * 2)
+                mMaxJumpHeight = MAX_JUMP_HEIGHT;
             mJumpHeight += SPEED_JUMP;
             mYval = +SPEED_JUMP;
         }
     }
 
-    StatusCollisionwithMap stCollision = checkCollisonwithMap(gTileSet, camera);
+    StatusCollisionwithMap stCollision = checkCollisonwithMap(gTileSet, camera, indexReturn, i_tile_return);
     if (stCollision == DIE)
         mStatus = DEATH;
+    else if (stCollision == ON_GROUND)
+    {
+        mYval = mYval - (mBox.y + mYval + mBox.h - gTileSet[indexReturn]->getBox().y) - 1;
+        mJumpHeight = 0;
+    }
+    else if (stCollision == TAKE_SPECIAL_BOX)
+    {
+        mJumpHeight = 0;
+        mMaxJumpHeight = SPECIAL_MAX_JUMP_HEIGHT;
+    }
 }
 
 void PlayerObject::handleMove()

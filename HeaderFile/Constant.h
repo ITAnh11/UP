@@ -11,6 +11,7 @@
 #include <vector>
 #include <fstream>
 #include <math.h>
+#include <time.h>
 
 using namespace std;
 
@@ -30,7 +31,9 @@ const int NUM_FRAMES_JUMP = 3;
 const int NUM_FRAMES_MOVE = 8;
 const int SPEED_MOVE = 4;
 const int SPEED_JUMP = 6;
+const int SPECIAL_SPEED_JUMP = 16;
 const int MAX_JUMP_HEIGHT = SPEED_JUMP * 100;
+const int SPECIAL_MAX_JUMP_HEIGHT = SPECIAL_SPEED_JUMP * 100;
 
 // The dimensions of map
 const int MAP_WIDTH = SCREEN_WIDTH;
@@ -44,13 +47,26 @@ const int NUM_TILE_COLS = MAP_WIDTH / TILE_WIDTH;
 const int TOTAL_TILES = MAP_HEIGHT * MAP_WIDTH / (TILE_HEIGHT * TILE_WIDTH);
 const int TOTAL_TILE_SPRITES = 10;
 
+const int TILE_GROUND_BEGIN = 0;
+const int TILE_GROUND_END = 2;
+const int TILE_THORN_BEGIN = 3;
+const int TILE_THORN_END = 5;
+const int TILE_CLOUD_BEGIN = 6;
+const int TILE_CLOUD_END = 8;
 const int TILE_SPECIAL_BOX = 9;
-const int TILE_DIE_BEGIN = 3;
-const int TILE_DIE_END = 5;
+
+const int PROBABILITY_TILE_GROUND = 1;
+const int PROBABILITY_TILE_CLOUD = 4;
+const int PROBABILITY_TILE_THORN = 5;
+const int PROBABILITY_TILE_SPECIAL_BOX = 5;
+
+const int VAL_I_NEXT_HAVE_TILE = 6;
 
 extern SDL_Window *gWindow;
 extern SDL_Renderer *gRenderer;
 
 // Box collision detector
 bool checkCollision(SDL_Rect a, SDL_Rect b);
+int randomBetween(const int a, const int b);
+
 #endif

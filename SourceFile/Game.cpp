@@ -28,7 +28,8 @@ bool GAME::run()
     int frameTime;
 
     gPlayer->setXY(SCREEN_WIDTH / 2, MAP_HEIGHT - TILE_HEIGHT - gPlayer->getHeight() * gPlayer->getScale());
-    // gPlayer->setXY(300,900);
+    int indexReturn = -1;
+    int i_tile_return = -1;
     while (!quit)
     {
         frameStart = SDL_GetTicks();
@@ -43,9 +44,12 @@ bool GAME::run()
             gPlayer->handleInputAction(event);
         }
         // move player
-        gPlayer->doPlayer(gTileSet, gCamera);
+        gPlayer->doPlayer(gTileSet, gCamera, indexReturn, i_tile_return);
         gPlayer->handleMove();
         gPlayer->setCamera(gCamera);
+
+        // update map
+        GAMEMAP::updateRandom(i_tile_return, indexReturn, gCamera);
 
         StatusPlayer stPlayer = gPlayer->getStatus();
         if (stPlayer == DEATH)

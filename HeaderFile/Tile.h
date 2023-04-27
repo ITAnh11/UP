@@ -12,13 +12,17 @@ public:
     Tile(int x, int y, int tileType);
 
     // Shows the tile
-    void render(SDL_Rect &camera,BaseObject *gTileTexture,SDL_Rect *gTileClips);
+    void render(SDL_Rect &camera, BaseObject *gTileTexture, SDL_Rect *gTileClips);
+
+    void set(const int tileType) { mType = tileType; }
 
     // Get the tile type
     int getType();
 
     // Get the collision box
     SDL_Rect getBox();
+
+    void free();
 
 private:
     // The attributes of the tile

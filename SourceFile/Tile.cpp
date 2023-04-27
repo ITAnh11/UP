@@ -36,3 +36,8 @@ SDL_Rect Tile::getBox()
 {
     return mBox;
 }
+
+void Tile::free()
+{
+    mType = -1;
+}
