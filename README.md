@@ -23,12 +23,9 @@
         https://user-images.githubusercontent.com/111406683/233792951-73077b77-daa1-4041-b116-1ee0f36576b9.mp4
 
         - 2.2.3 interact with map, random map to play infinity
-<<<<<<< HEAD
+
     - 2.3 Text on screen
         - 2.3.1 Scores, highest scores at pos highest, file save highest scores
         
-=======
+        https://user-images.githubusercontent.com/111406683/235213419-491cc06b-2268-4ebe-9cda-439b10561d26.mp4
 
-        https://user-images.githubusercontent.com/111406683/234950201-de1c57c4-3ae1-47ba-8ae1-ad0b790f65d2.mp4
-
->>>>>>> d8853ee13f8debed3e8a7851b39cfec01544a835
