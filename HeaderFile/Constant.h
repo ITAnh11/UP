@@ -25,16 +25,6 @@ const int COLOR_KEY_R = 0;
 const int COLOR_KEY_G = 255;
 const int COLOR_KEY_B = 255;
 
-// Player
-const int NUM_FRAMES_IDLE = 10;
-const int NUM_FRAMES_JUMP = 3;
-const int NUM_FRAMES_MOVE = 8;
-const int SPEED_MOVE = 4;
-const int SPEED_JUMP = 6;
-const int SPECIAL_SPEED_JUMP = 16;
-const int MAX_JUMP_HEIGHT = SPEED_JUMP * 100;
-const int SPECIAL_MAX_JUMP_HEIGHT = SPECIAL_SPEED_JUMP * 100;
-
 // The dimensions of map
 const int MAP_WIDTH = SCREEN_WIDTH;
 const int MAP_HEIGHT = SCREEN_HEIGHT * 4;
@@ -62,8 +52,28 @@ const int PROBABILITY_TILE_SPECIAL_BOX = 5;
 
 const int VAL_I_NEXT_HAVE_TILE = 6;
 
+// Player
+const int NUM_FRAMES_IDLE = 10;
+const int NUM_FRAMES_JUMP = 3;
+const int NUM_FRAMES_MOVE = 8;
+const int SPEED_MOVE = 4;
+const int SPEED_JUMP = TILE_HEIGHT / 4;
+const int SPECIAL_SPEED_JUMP = TILE_HEIGHT / 2;
+const int MAX_JUMP_HEIGHT = SPEED_JUMP * 100;
+const int SPECIAL_MAX_JUMP_HEIGHT = SPECIAL_SPEED_JUMP * 100;
+
+// Size Text
+const int TEXT_SIZE_BIG = 80;
+const int TEXT_SIZE_MEDIUM = 40;
+const int TEXT_SIZE_SMALL = 20;
+
+// The window we'll be rendering to
 extern SDL_Window *gWindow;
+
+// The window renderer
 extern SDL_Renderer *gRenderer;
+
+extern TTF_Font *gFont;
 
 // Box collision detector
 bool checkCollision(SDL_Rect a, SDL_Rect b);

@@ -14,6 +14,7 @@ PlayerObject::PlayerObject()
     mDirect = RIGHT;
     mStatus = IDLE;
     mOnGround = false;
+    mJumpScores = 0;
 }
 
 PlayerObject::~PlayerObject()
@@ -137,7 +138,7 @@ StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileS
     return statusCollision;
 }
 
-void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return)
+void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return, int &gScores)
 {
     if (mInputAction.moveLeft)
         mXval = -SPEED_MOVE;
@@ -173,15 +174,21 @@ void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &ind
     StatusCollisionwithMap stCollision = checkCollisonwithMap(gTileSet, camera, indexReturn, i_tile_return);
     if (stCollision == DIE)
         mStatus = DEATH;
-    else if (stCollision == ON_GROUND)
+    else
     {
-        mYval = mYval - (mBox.y + mYval + mBox.h - gTileSet[indexReturn]->getBox().y) - 1;
-        mJumpHeight = 0;
-    }
-    else if (stCollision == TAKE_SPECIAL_BOX)
-    {
-        mJumpHeight = 0;
-        mMaxJumpHeight = SPECIAL_MAX_JUMP_HEIGHT;
+        setScores(gScores);
+
+        if (stCollision == ON_GROUND)
+        {
+            mYval = mYval - (mBox.y + mYval + mBox.h - gTileSet[indexReturn]->getBox().y) - 1;
+            mJumpHeight = 0;
+            gScores -= mYval;
+        }
+        else if (stCollision == TAKE_SPECIAL_BOX)
+        {
+            mJumpHeight = 0;
+            mMaxJumpHeight = SPECIAL_MAX_JUMP_HEIGHT;
+        }
     }
 }
 
@@ -189,6 +196,8 @@ void PlayerObject::handleMove()
 {
     mRect.x += mXval;
     mRect.y += mYval;
+
+    mJumpScores -= mYval;
 
     if (mRect.x > SCREEN_WIDTH)
         mRect.x = 0 - mWidth / mNumberFrame;
@@ -295,4 +304,10 @@ void PlayerObject::setCamera(SDL_Rect &camera)
     {
         camera.y = MAP_HEIGHT - camera.h;
     }
+}
+
+void PlayerObject::setScores(int &gScores)
+{
+    gScores += mJumpScores;
+    mJumpScores = 0;
 }

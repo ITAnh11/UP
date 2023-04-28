@@ -44,21 +44,22 @@ public:
 	void setClip();
 	void setNumFrame(const int val) { mNumberFrame = val; }
 	void setRectangle();
-
 	// Centers the camera over the dot
 	void setCamera(SDL_Rect &camera);
+	void setScores(int &gScores);
 
 	void renderClips(SDL_Rect &camera);
 
 	StatusCollisionwithMap checkCollisonwithMap(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return);
 
-	void doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return);
+	void doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return, int &gScores);
 	void handleMove();
 	void handleInputAction(SDL_Event event);
 
 	SDL_Rect getRect() const { return mRect; }
 	float getScale() const { return mScale; }
 	StatusPlayer getStatus() { return mStatus; }
+	SDL_Rect getBox() const { return mBox; }
 
 private:
 	SDL_Rect mRect;
@@ -74,6 +75,7 @@ private:
 	StatusPlayer mStatus;
 	bool mOnGround;
 	SDL_Rect mBox;
+	int mJumpScores;
 };
 
 #endif

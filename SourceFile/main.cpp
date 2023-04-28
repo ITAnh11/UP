@@ -163,6 +163,7 @@ int main(int argc, char *args[])
     }
 
     GAME::run();
+    GAME::createSaveGame();
 
     close();
     return 0;

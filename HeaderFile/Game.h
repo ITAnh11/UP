@@ -7,9 +7,11 @@
 
 namespace GAME
 {
+    void loadSave();
     bool initGame();
     bool loadPlayer();
     bool run();
+    void createSaveGame();
 };
 
 #endif
