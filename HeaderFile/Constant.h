@@ -80,3 +80,4 @@ bool checkCollision(SDL_Rect a, SDL_Rect b);
 int randomBetween(const int a, const int b);
 
 #endif
+

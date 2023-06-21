@@ -3,6 +3,7 @@
 
 TextObject gTextScores;
 TextObject gTextHighestScores;
+TextObject gYouDIE;
 
 void GAME::loadSave()
 {
@@ -42,7 +43,7 @@ bool GAME::initGame()
     if (gFont)
     {
         // Render text
-        SDL_Color textColor = {255, 255, 0};
+        SDL_Color textColor = {255, 115, 20};
         gTextHighestScores.loadFromRenderedText("*********************************************Highest scores: " + to_string(gHighestScores) + " *********************************************", textColor);
     }
 
@@ -92,8 +93,8 @@ bool GAME::run()
         StatusPlayer stPlayer = gPlayer->getStatus();
         if (stPlayer == DEATH)
         {
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "UP", "You Die", NULL);
-            quit = true;
+            gameOver();
+            break;
         }
 
         SDL_SetRenderDrawColor(gRenderer, 0xff, 0xff, 0xff, 0xff);
@@ -112,7 +113,12 @@ bool GAME::run()
 
         if (gScores <= gHighestScores && gHighestScores <= gScores + SCREEN_HEIGHT)
         {
-            gTextHighestScores.render(SCREEN_WIDTH / 2 - gTextHighestScores.getWidth() / 2, SCREEN_HEIGHT - (gHighestScores - gScores));
+            if (gScores <= SCREEN_HEIGHT * 3 / 2)
+            {
+                gTextHighestScores.render(SCREEN_WIDTH / 2 - gTextHighestScores.getWidth() / 2, SCREEN_HEIGHT - gHighestScores - (gCamera.y - MAP_HEIGHT + SCREEN_HEIGHT));
+            }
+            else
+                gTextHighestScores.render(SCREEN_WIDTH / 2 - gTextHighestScores.getWidth() / 2, SCREEN_HEIGHT - (gHighestScores - gScores));
         }
 
         SDL_RenderPresent(gRenderer);
@@ -125,6 +131,56 @@ bool GAME::run()
     }
 
     return true;
+}
+
+void GAME::gameOver()
+{
+    bool quit = false;
+
+    Uint32 frameStart;
+    int frameTime;
+
+    int size = 1;
+
+    while (!quit)
+    {
+        frameStart = SDL_GetTicks();
+
+        SDL_SetRenderDrawColor(gRenderer, 0xff, 0xff, 0xff, 0xff);
+        SDL_RenderClear(gRenderer);
+
+        gBackground->render(0, 0);
+
+        GAMEMAP::render();
+
+        gPlayer->renderClips(gCamera);
+
+        SDL_Color textColor;
+
+        textColor = {255, 0, 0};
+        gFont = TTF_OpenFont("font/ChakraPetch-Regular.ttf", size);
+        gYouDIE.loadFromRenderedText("You Die", textColor);
+        gYouDIE.render(SCREEN_WIDTH / 2 - gYouDIE.getWidth() / 2, SCREEN_HEIGHT / 2 - 200);
+        ++size;
+
+        textColor = {249, 249, 0};
+        gFont = TTF_OpenFont("font/ChakraPetch-Regular.ttf", TEXT_SIZE_MEDIUM);
+        gTextHighestScores.loadFromRenderedText("Highest scores : " + to_string(gHighestScores), textColor);
+        gTextHighestScores.render(SCREEN_WIDTH / 2 - gTextHighestScores.getWidth() / 2, SCREEN_HEIGHT / 2 - 100);
+
+        gFont = TTF_OpenFont("font/ChakraPetch-Regular.ttf", TEXT_SIZE_SMALL);
+        gTextScores.loadFromRenderedText("Your scores : " + to_string(gScores), textColor);
+        gTextScores.render(SCREEN_WIDTH / 2 - gTextScores.getWidth() / 2, SCREEN_HEIGHT / 2);
+
+        SDL_RenderPresent(gRenderer);
+        frameTime = SDL_GetTicks() - frameStart;
+        if (frameDelay > frameTime)
+        {
+            SDL_Delay(frameDelay - frameTime);
+        }
+        if (size == TEXT_SIZE_BIG)
+            quit = true;
+    }
 }
 
 void GAME::createSaveGame()

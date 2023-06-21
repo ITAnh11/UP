@@ -172,11 +172,11 @@ void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &ind
     }
 
     StatusCollisionwithMap stCollision = checkCollisonwithMap(gTileSet, camera, indexReturn, i_tile_return);
+    setScores(gScores);
     if (stCollision == DIE)
         mStatus = DEATH;
     else
     {
-        setScores(gScores);
 
         if (stCollision == ON_GROUND)
         {

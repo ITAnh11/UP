@@ -11,6 +11,7 @@ namespace GAME
     bool initGame();
     bool loadPlayer();
     bool run();
+    void gameOver();
     void createSaveGame();
 };
 
