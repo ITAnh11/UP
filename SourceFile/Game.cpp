@@ -6,6 +6,7 @@ TextObject gTextHighestScores;
 TextObject gYouDIE;
 TextObject gPlay;
 TextObject gQuit;
+TextObject gUP;
 
 void GAME::loadSave()
 {
@@ -25,11 +26,13 @@ bool GAME::initGame()
     loadSave();
     gScores = 0;
 
+    top_i_have_tile = 54;
     if (!GAMEMAP::setTiles("Image/map/map.txt"))
     {
         success = false;
         printf("Failed to set tiles\n");
     }
+
     SDL_Color textColor;
     // Open the font
     gFont = TTF_OpenFont("font/ChakraPetch-Regular.ttf", TEXT_SIZE_SMALL);
@@ -50,12 +53,23 @@ bool GAME::initGame()
     gFont = TTF_OpenFont("font/ChakraPetch-Regular.ttf", TEXT_SIZE_MEDIUM);
     if (gFont)
     {
-        textColor = {255, 65, 0};
+        textColor = {0, 255, 65};
         gPlay.loadFromRenderedText("PLAY", textColor);
+        gPlay.setPos(0, MAP_HEIGHT - 352);
+
         textColor = {255, 0, 0};
         gQuit.loadFromRenderedText("QUIT", textColor);
+        gQuit.setPos(SCREEN_WIDTH - gQuit.getWidth(), MAP_HEIGHT - 352);
     }
 
+    gFont = TTF_OpenFont("font/BagelFatOne-Regular.ttf", TEXT_SIZE_BIG * 2);
+    if (gFont)
+    {
+        textColor = {243, 0, 243};
+        gUP.loadFromRenderedText("UP", textColor);
+    }
+
+    // init player
     loadPlayer();
 
     return success;
@@ -85,11 +99,11 @@ bool GAME::menuGame(bool &is_play)
 {
     if (!is_play)
     {
+        gUP.render(SCREEN_WIDTH / 2 - gUP.getWidth() / 2, SCREEN_HEIGHT / 2 - gUP.getHeight() / 2 - 250 - (gCamera.y - MAP_HEIGHT + SCREEN_HEIGHT) / 4);
+
         gPlay.render(0, 256 - (gCamera.y - MAP_HEIGHT + SCREEN_HEIGHT));
-        gPlay.setPos(0, MAP_HEIGHT - 352);
 
         gQuit.render(SCREEN_WIDTH - gQuit.getWidth(), 256 - (gCamera.y - MAP_HEIGHT + SCREEN_HEIGHT));
-        gQuit.setPos(SCREEN_WIDTH - gQuit.getWidth(), MAP_HEIGHT - 352);
 
         if (checkCollision(gQuit.getPos(), gPlayer->getBox()))
             return false;
