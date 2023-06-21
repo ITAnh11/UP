@@ -1,12 +1,14 @@
 #include "../HeaderFile/Game.h"
 #include "../HeaderFile/TextObject.h"
 
+// text
 TextObject gTextScores;
 TextObject gTextHighestScores;
 TextObject gYouDIE;
 TextObject gPlay;
 TextObject gQuit;
 TextObject gUP;
+
 
 void GAME::loadSave()
 {
@@ -90,6 +92,7 @@ bool GAME::loadPlayer()
         gPlayer->setScale(2);
         gPlayer->setRectangle();
         gPlayer->setXY(SCREEN_WIDTH / 2, MAP_HEIGHT - TILE_HEIGHT - gPlayer->getBox().h - 10);
+        gPlayer->loadSound();
     }
 
     return true;
@@ -263,4 +266,15 @@ void GAME::createSaveGame()
         fo << "Highest scores:\n";
         fo << gHighestScores;
     }
+}
+void GAME::free()
+{
+    gPlayer->freeSound();
+
+    gTextHighestScores.free();
+    gTextScores.free();
+    gPlay.free();
+    gQuit.free();
+    gUP.free();
+    gYouDIE.free();
 }

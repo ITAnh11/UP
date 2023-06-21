@@ -1,4 +1,10 @@
 #include "../HeaderFile/PlayerObject.h"
+
+// sound
+Mix_Chunk *gSJump = NULL;
+Mix_Chunk *gSTakeBox = NULL;
+Mix_Chunk *gSDie = NULL;
+
 PlayerObject::PlayerObject()
 {
     mRect = {0, 0, 0, 0};
@@ -174,7 +180,11 @@ void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &ind
     StatusCollisionwithMap stCollision = checkCollisonwithMap(gTileSet, camera, indexReturn, i_tile_return);
     setScores(gScores);
     if (stCollision == DIE)
+    {
         mStatus = DEATH;
+        Mix_PlayChannel(-1, gSDie, 0);
+    }
+
     else
     {
 
@@ -183,11 +193,13 @@ void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &ind
             mYval = mYval - (mBox.y + mYval + mBox.h - gTileSet[indexReturn]->getBox().y) - 1;
             mJumpHeight = 0;
             gScores -= mYval;
+            Mix_PlayChannel(-1, gSJump, 0);
         }
         else if (stCollision == TAKE_SPECIAL_BOX)
         {
             mJumpHeight = 0;
             mMaxJumpHeight = SPECIAL_MAX_JUMP_HEIGHT;
+            Mix_PlayChannel(-1, gSTakeBox, 0);
         }
     }
 }
@@ -261,6 +273,7 @@ void PlayerObject::handleInputAction(SDL_Event event)
                 loadFromFile("Image/Player/3_player_jump_48x48.png");
                 setNumFrame(NUM_FRAMES_JUMP);
                 setClip();
+                Mix_PlayChannel(-1, gSJump, 0);
             }
             else if ((mInputAction.moveLeft || mInputAction.moveRight) && mInputAction.jump == false)
             {
@@ -326,4 +339,22 @@ void PlayerObject::reset()
     mStatus = IDLE;
     mOnGround = false;
     mJumpScores = 0;
+}
+
+void PlayerObject::loadSound()
+{
+    // Load sound effects
+    gSJump = Mix_LoadWAV("sound/Jump.wav");
+    gSTakeBox = Mix_LoadWAV("sound/take_special_box.wav");
+    gSDie = Mix_LoadWAV("sound/die.wav");
+}
+
+void PlayerObject::freeSound()
+{
+    Mix_FreeChunk(gSJump);
+    Mix_FreeChunk(gSTakeBox);
+    Mix_FreeChunk(gSDie);
+    gSJump = NULL;
+    gSTakeBox = NULL;
+    gSDie = NULL;
 }

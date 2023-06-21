@@ -21,6 +21,8 @@ namespace GAME
     void renderScore();
     void gameOver();
     void createSaveGame();
+
+    void free();
 };
 
 #endif

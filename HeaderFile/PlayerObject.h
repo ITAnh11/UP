@@ -5,6 +5,11 @@
 #include "BaseObject.h"
 #include "Tile.h"
 
+// sound
+extern Mix_Chunk *gSJump;
+extern Mix_Chunk *gSTakeBox;
+extern Mix_Chunk *gSDie;
+
 enum Direction
 {
 	LEFT,
@@ -62,6 +67,8 @@ public:
 	SDL_Rect getBox() const { return mBox; }
 
 	void reset();
+	void loadSound();
+	void freeSound();
 
 private:
 	SDL_Rect mRect;

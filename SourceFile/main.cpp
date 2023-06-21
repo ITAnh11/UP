@@ -159,6 +159,7 @@ int main(int argc, char *args[])
             break;
     }
 
+    GAME::free();
     close();
     return 0;
 }

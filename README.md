@@ -37,3 +37,4 @@
 
         https://github.com/ITAnh11/UP/assets/111406683/15a75e41-4477-4922-a967-8b510f986c41
 
+    - 2.4 sound effect
