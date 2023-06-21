@@ -7,10 +7,18 @@
 
 namespace GAME
 {
+    enum StatusGame
+    {
+        QUIT,
+        PLAY,
+    };
+
     void loadSave();
     bool initGame();
     bool loadPlayer();
-    bool run();
+    bool menuGame(bool &is_play);
+    StatusGame run();
+    void renderScore();
     void gameOver();
     void createSaveGame();
 };

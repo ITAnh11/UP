@@ -311,3 +311,19 @@ void PlayerObject::setScores(int &gScores)
     gScores += mJumpScores;
     mJumpScores = 0;
 }
+
+void PlayerObject::reset()
+{
+    mFrame = 0;
+    mInputAction.moveRight = false;
+    mInputAction.moveLeft = false;
+    mInputAction.jump = false;
+    mJumpHeight = 0;
+    mMaxJumpHeight = MAX_JUMP_HEIGHT;
+    mXval = 0;
+    mYval = 0;
+    mDirect = RIGHT;
+    mStatus = IDLE;
+    mOnGround = false;
+    mJumpScores = 0;
+}

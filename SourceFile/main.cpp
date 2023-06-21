@@ -96,30 +96,12 @@ bool loadMedia()
         gBackground->setScale(1.0f * SCREEN_HEIGHT / gBackground->getHeight());
     }
 
-    if (!gPlayer->loadFromFile("Image/Player/10_Character_Idle_48x48.png"))
-    {
-        success = false;
-        printf("Failed to load player\n");
-    }
-    else
-    {
-        gPlayer->setNumFrame(NUM_FRAMES_IDLE);
-        gPlayer->setClip();
-        gPlayer->setScale(2);
-        gPlayer->setRectangle();
-    }
-
     if (!gTileTexture->loadFromFile("Image/map/tile.png"))
     {
         success = false;
         printf("Failed to load image tile\n");
     }
 
-    if (!GAME::initGame())
-    {
-        success = false;
-        printf("Failed to init game\n");
-    }
     return success;
 }
 
@@ -155,15 +137,27 @@ int main(int argc, char *args[])
         printf("Failed to initialize!\n");
         return 1;
     }
-    // Load media
+
     if (!loadMedia())
     {
-        printf("Failed to load media!\n");
         return 1;
     }
 
-    GAME::run();
-    GAME::createSaveGame();
+    while (true)
+    {
+        if (!GAME::initGame())
+        {
+            printf("Failed to init game\n");
+            return 1;
+        }
+
+        GAME::StatusGame st = GAME::run();
+
+        GAME::createSaveGame();
+
+        if (st == GAME::QUIT)
+            break;
+    }
 
     close();
     return 0;

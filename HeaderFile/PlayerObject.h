@@ -61,6 +61,8 @@ public:
 	StatusPlayer getStatus() { return mStatus; }
 	SDL_Rect getBox() const { return mBox; }
 
+	void reset();
+
 private:
 	SDL_Rect mRect;
 	int mFrame;
