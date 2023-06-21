@@ -30,3 +30,5 @@
         https://user-images.githubusercontent.com/111406683/235213419-491cc06b-2268-4ebe-9cda-439b10561d26.mp4
 
         - 2.3.2 Gameover
+        https://github.com/ITAnh11/UP/assets/111406683/7ac94806-4c6d-4f28-94db-2ee56ebdfd75
+
