@@ -25,6 +25,7 @@ PlayerObject::PlayerObject()
 
 PlayerObject::~PlayerObject()
 {
+    
 }
 
 void PlayerObject::setXY(const int x, const int y)
@@ -57,6 +58,7 @@ void PlayerObject::renderClips(SDL_Rect &camera)
     SDL_Rect *currentClip = &mSpriteClips[mFrame];
     if (mInputAction.jump)
     {
+        // thay đổi hình ảnh nhảy nhân vật theo độ cao mMaxJumpheight
         if (mJumpHeight < mMaxJumpHeight - SPEED_JUMP * 6)
             mFrame = 0;
         else if (mJumpHeight >= mMaxJumpHeight - SPEED_JUMP * 6 && mJumpHeight < mMaxJumpHeight + SPEED_JUMP * 2)
@@ -71,27 +73,36 @@ void PlayerObject::renderClips(SDL_Rect &camera)
             mFrame = 0;
     }
 
+    // hướng quay trái, phải của nhân vật
     if (mDirect == LEFT)
         render(mRect.x - camera.x, mRect.y - camera.y, currentClip, 0, 0, SDL_FLIP_HORIZONTAL);
     else
         render(mRect.x - camera.x, mRect.y - camera.y, currentClip);
 }
 
+// hàm trả về trạng thái va chạm với map
+// indexReturn, i_tile_return trả về vị trí va chạm để sau xử lý thay đổi map 
 StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return)
 {
+    // khi nhân vật đang nhảy lên sẽ không va chạm
     if (mJumpHeight <= mMaxJumpHeight)
         return NONE;
 
     StatusCollisionwithMap statusCollision = NONE;
     bool collision = false;
 
+    // lấy khung hình chữ nhật Box của nhân vật (vị trí, chiều cao, chiều rộng)
     SDL_Rect a = mBox;
 
     // check down
+    // kiểm tra va chạm ở chân nhân vật khi di chuyển mYval
     a.x = mBox.x;
     a.y = mBox.y + mYval;
 
+    // vị trí hàng i mà chân nhân vật đang ở 
     int i_tile = (a.y + a.h) / TILE_HEIGHT;
+
+    // hàng i quá số lượng hàng của MAP thì die
     if (i_tile >= NUM_TILE_ROWS)
         return DIE;
 
@@ -99,8 +110,10 @@ StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileS
     if (j_tile < 0)
         j_tile = 0;
 
+    // chỉ kiểm tra va chạm map khi nhân vật trong khung hình camera 
     if (checkCollision(mBox, camera))
     {
+        // đổi từ mảng 2 chiều sang 1 chiều
         int index = i_tile * NUM_TILE_COLS + j_tile;
 
         for (int nextIndex = 0; nextIndex < 3; ++nextIndex)
@@ -146,6 +159,7 @@ StatusCollisionwithMap PlayerObject::checkCollisonwithMap(vector<Tile *> &gTileS
 
 void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &indexReturn, int &i_tile_return, int &gScores)
 {
+
     if (mInputAction.moveLeft)
         mXval = -SPEED_MOVE;
     if (mInputAction.moveRight)
@@ -178,7 +192,9 @@ void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &ind
     }
 
     StatusCollisionwithMap stCollision = checkCollisonwithMap(gTileSet, camera, indexReturn, i_tile_return);
+
     setScores(gScores);
+
     if (stCollision == DIE)
     {
         mStatus = DEATH;
@@ -187,23 +203,29 @@ void PlayerObject::doPlayer(vector<Tile *> &gTileSet, SDL_Rect &camera, int &ind
 
     else
     {
-
+        // khi nhân vật nhảy được lên mặt đất
         if (stCollision == ON_GROUND)
         {
+            // chỉnh lại giá trị mYval để cho nhân vật đứng trên mặt đất sau khi di chuyển
             mYval = mYval - (mBox.y + mYval + mBox.h - gTileSet[indexReturn]->getBox().y) - 1;
             mJumpHeight = 0;
             gScores -= mYval;
+
+            // âm thanh nhảy
             Mix_PlayChannel(-1, gSJump, 0);
         }
         else if (stCollision == TAKE_SPECIAL_BOX)
         {
             mJumpHeight = 0;
             mMaxJumpHeight = SPECIAL_MAX_JUMP_HEIGHT;
+            
+            // âm thanh nhặt hộp bí mật
             Mix_PlayChannel(-1, gSTakeBox, 0);
         }
     }
 }
 
+// di chuyển nhân vật
 void PlayerObject::handleMove()
 {
     mRect.x += mXval;
@@ -221,7 +243,9 @@ void PlayerObject::handleMove()
 
 void PlayerObject::handleInputAction(SDL_Event event)
 {
+    // nextStatus để kiểm tra có thay đổi trạng nhân vật hay không
     StatusPlayer nextStatus = mStatus;
+
     if (event.type == SDL_KEYDOWN)
     {
         switch (event.key.keysym.sym)
@@ -262,6 +286,8 @@ void PlayerObject::handleInputAction(SDL_Event event)
         }
     }
 
+    // nếu thay đổi trạng thái thì load lại ảnh theo trạng thái đó
+    // sau khi space thì nhân  vật sẽ luôn trong trạng thái nhảy
     if (nextStatus != mStatus)
     {
         mStatus = nextStatus;

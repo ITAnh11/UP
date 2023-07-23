@@ -1,5 +1,7 @@
 #include "../HeaderFile/GameMap.h"
 
+// khởi tạo map ban đầu, map lưu dưới dạng mảng 1 chiều
+// set vị trí cho các tile
 bool GAMEMAP::setTiles(const string path)
 {
     // Success flag
@@ -64,6 +66,7 @@ bool GAMEMAP::setTiles(const string path)
                 y += TILE_HEIGHT;
             }
         }
+
         // Clip the sprite sheet
         if (tilesLoaded)
         {
@@ -94,17 +97,21 @@ void GAMEMAP::render()
     }
 }
 
+// cập nhật map sau khi va chạm tại vị trí index
 void GAMEMAP::updateCollision(int &index)
 {
+    // -1 là khi không va chạm
     if (index == -1)
         return;
 
     int typeTile = gTileSet[index]->getType();
 
+    // special_box bị xóa đi
     if (typeTile == TILE_SPECIAL_BOX)
     {
         gTileSet[index]->free();
     }
+    // mây bị xóa đi
     else if (TILE_CLOUD_BEGIN <= typeTile && typeTile <= TILE_CLOUD_END)
     {
         gTileSet[index]->free();
@@ -119,6 +126,7 @@ void GAMEMAP::updateCollision(int &index)
     }
     else if (TILE_GROUND_BEGIN <= typeTile && typeTile <= TILE_GROUND_END)
     {
+        // ngẫu nhiên đất biến thành mây
         int prob = randomBetween(0, PROBABILITY_TILE_CLOUD);
         if (prob == PROBABILITY_TILE_CLOUD)
         {
@@ -136,6 +144,7 @@ void GAMEMAP::updateCollision(int &index)
     index = -1;
 }
 
+// đẩy map xuống numRows hàng từ vị trí va chạm
 void GAMEMAP::pushMapDown(SDL_Rect &camera, int &numRows)
 {
     int i_tileEnd_camera = (camera.y + camera.h) / TILE_HEIGHT;
@@ -144,6 +153,7 @@ void GAMEMAP::pushMapDown(SDL_Rect &camera, int &numRows)
 
     if (i_distance > 0)
     {
+        // xóa các tile trước khi đẩy map xuống, tránh lỗi map
         for (int i = NUM_TILE_ROWS - 1; i >= i_distance; --i)
         {
             for (int j = 0; j < NUM_TILE_COLS; ++j)
@@ -153,6 +163,7 @@ void GAMEMAP::pushMapDown(SDL_Rect &camera, int &numRows)
             }
         }
 
+        // đẩy map xuống
         for (int i = 0; i < i_distance; ++i)
         {
             for (int j = 0; j < NUM_TILE_COLS; ++j)
@@ -161,6 +172,7 @@ void GAMEMAP::pushMapDown(SDL_Rect &camera, int &numRows)
             }
         }
 
+        // đưa nhân vật xuống theo map
         gPlayer->setXY(gPlayer->getRect().x, gPlayer->getRect().y + i_distance * TILE_HEIGHT);
         gPlayer->setCamera(camera);
         gPlayer->setRectangle();
@@ -169,6 +181,7 @@ void GAMEMAP::pushMapDown(SDL_Rect &camera, int &numRows)
     }
 }
 
+// khởi tạo ngẫu nhiên phần trên của map sau khi đẩy xuống numRows hàng
 void GAMEMAP::randomTopMap(const int &numRows)
 {
     if (numRows == -1) return;
